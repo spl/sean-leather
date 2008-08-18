@@ -1,0 +1,26 @@
+#!/bin/bash
+
+SWAPTMP=$1-swap-tmp
+
+if [ ! -e "$1" ]
+then
+  echo "File \`$1' does not exist!"
+  exit -1
+fi
+
+if [ ! -e "$2" ]
+then
+  echo "File \`$2' does not exist!"
+  exit -1
+fi
+
+if [ -e "$SWAPTMP" ]
+then
+  echo "Temporary file \`$SWAPTMP' already exists!"
+  exit -1
+fi
+
+mv $1 $SWAPTMP
+mv $2 $1
+mv $SWAPTMP $2
+

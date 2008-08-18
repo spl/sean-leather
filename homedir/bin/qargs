@@ -1,0 +1,10 @@
+#!/usr/bin/perl -w
+
+my $cmd = join ' ', @ARGV;
+my $output = "";
+
+while (<STDIN>) {
+  chomp;
+  $output .= " \"$_\"";
+}
+system "$cmd $output";
