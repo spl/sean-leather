@@ -1,0 +1,7 @@
+#!/bin/bash
+if type gfind &> /dev/null
+then
+  gfind $*
+else
+  /usr/bin/find $*
+fi

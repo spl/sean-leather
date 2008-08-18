@@ -1,0 +1,3 @@
+:set stop :list
+:set -fbreak-on-exception
+

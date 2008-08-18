@@ -1,0 +1,8 @@
+#!/bin/sh
+
+DIFF="/usr/bin/diff"
+
+LEFT=${6}
+RIGHT=${7}
+
+$DIFF -w $LEFT $RIGHT

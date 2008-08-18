@@ -1,0 +1,2 @@
+#!/bin/bash
+find $* -not -wholename "*.svn*" -a -iname "*\.c" -o -iname "*\.cpp" -o -iname "*\.h" -o -iname "makefile"

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+APP="/cygdrive/c/Program Files/Microsoft Office/Office10/EXCEL.EXE"
+
+exec "${APP}" ${1+"$@"} &
