@@ -1,0 +1,9 @@
+#!/bin/bash
+if type gfind &> /dev/null
+then
+  MYFIND=gfind
+else
+  MYFIND=/usr/bin/find
+fi
+
+${MYFIND} $* -not -wholename "*_darcs*" -a -name "*.hs" -o -name "*.lhs"
