@@ -1,6 +1,13 @@
 #!/bin/bash
 
-SWAPTMP=$1-swap-tmp
+# Test whether command-line argument is present (non-empty).
+if [ -n "$1" -a -n "$2" ]
+then
+  SWAPTMP=$1-swap-tmp
+else
+  echo "Usage: $0 file1 file2"
+  exit -1
+fi  
 
 if [ ! -e "$1" ]
 then
