@@ -1,0 +1,8 @@
+if [ "" = "$1" ]
+then
+  echo "Usage: mkdircd dirname"
+else
+  DIRNAME=$1
+  mkdir -p $DIRNAME
+  cd $DIRNAME
+fi
