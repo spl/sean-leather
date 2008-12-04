@@ -1,5 +1,1 @@
-GHC_DIR=/opt/ghc
-GHC_VERSION=6.10.1
-GHC_PATH=${GHC_DIR}/${GHC_VERSION}/bin
-
-append_to_path ${GHC_PATH}
+source ${MY_SOURCE_DIR}/ghc-config 6.10.1

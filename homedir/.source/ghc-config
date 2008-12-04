@@ -1,0 +1,40 @@
+GHC_DIR=/opt/ghc
+
+MY_USAGE="Usage: ghc-config  |"
+MY_SUCCESS="0"
+
+for d in `/bin/ls ${GHC_DIR}`
+do
+
+  CURR_VERSION=`echo ${PATH} | sed "s|.*${GHC_DIR}/\([^/]*\).*|\1|"`
+  if [ "${d}" = "${CURR_VERSION}" ]
+  then
+    MY_USAGE+=" ${d}* |"
+  else
+    MY_USAGE+=" ${d} |"
+  fi
+  unset CURR_VERSION
+
+  if [ "${d}" = "${1}" ]
+  then
+    GHC_VERSION=${1}
+    PATH=`echo ${PATH} | sed "s|${GHC_DIR}/[^/]*|${GHC_DIR}/${GHC_VERSION}|g"`
+    echo "You are now using GHC ${GHC_VERSION}."
+    MY_SUCCESS="1"
+  fi
+
+done
+
+if [ "${MY_SUCCESS}" = "0" ]
+then
+  if [ "" == "${1}" ]
+  then
+    echo ${MY_USAGE}
+  else
+    echo "Invalid version: ${1}"
+    echo ${MY_USAGE}
+  fi
+fi
+
+unset MY_SUCCESS
+unset MY_USAGE
