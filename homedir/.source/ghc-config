@@ -11,12 +11,21 @@ do
     GHC_VERSION=${1}
     GHC_PATH=${GHC_DIR}/${GHC_VERSION}/bin
 
+    # Set up path with correct version
     if [ "${CURR_VERSION}" = "" ]
     then
+      # No previous GHC path was found, so we append a new one to the path
       PATH=${PATH}:${GHC_PATH}
     else
+      # Search and replace the old version number with the new
       PATH=`echo ${PATH} | sed "s|${GHC_DIR}/[^/]*|${GHC_DIR}/${GHC_VERSION}|g"`
     fi
+
+    # Link to the cabal-install configuration directory
+    CABAL_DIR=${HOME}/.cabal
+    rm -f ${CABAL_DIR}
+    ln -s ${HOME}/.ghc-config/${GHC_VERSION}/cabal ${CABAL_DIR}
+    unset CABAL_DIR
 
     echo "You are now using GHC ${GHC_VERSION}."
     MY_SUCCESS="1"
