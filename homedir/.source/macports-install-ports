@@ -1,0 +1,4 @@
+sudo port install git-core +svn
+sudo port install findutils +with_default_names
+sudo port install wget
+sudo port install unrar
