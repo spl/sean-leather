@@ -1,40 +1,51 @@
 GHC_DIR=/opt/ghc
 
-MY_USAGE="Usage: ghc-config  |"
 MY_SUCCESS="0"
+MY_VERSIONS=`/bin/ls ${GHC_DIR}`
+CURR_VERSION=`echo $PATH | perl -nle 'print "$1" if m|.*/opt/ghc/([^/]+)/bin.*|'`
 
-for d in `/bin/ls ${GHC_DIR}`
+for v in ${MY_VERSIONS}
 do
-
-  CURR_VERSION=`echo ${PATH} | sed "s|.*${GHC_DIR}/\([^/]*\).*|\1|"`
-  if [ "${d}" = "${CURR_VERSION}" ]
-  then
-    MY_USAGE+=" ${d}* |"
-  else
-    MY_USAGE+=" ${d} |"
-  fi
-  unset CURR_VERSION
-
-  if [ "${d}" = "${1}" ]
+  if [ "${v}" = "${1}" ]
   then
     GHC_VERSION=${1}
-    PATH=`echo ${PATH} | sed "s|${GHC_DIR}/[^/]*|${GHC_DIR}/${GHC_VERSION}|g"`
+    GHC_PATH=${GHC_DIR}/${GHC_VERSION}/bin
+
+    if [ "${CURR_VERSION}" = "" ]
+    then
+      PATH=${PATH}:${GHC_PATH}
+    else
+      PATH=`echo ${PATH} | sed "s|${GHC_DIR}/[^/]*|${GHC_DIR}/${GHC_VERSION}|g"`
+    fi
+
     echo "You are now using GHC ${GHC_VERSION}."
     MY_SUCCESS="1"
   fi
-
 done
 
 if [ "${MY_SUCCESS}" = "0" ]
 then
-  if [ "" == "${1}" ]
+
+  if [ "${1}" != "" ]
   then
-    echo ${MY_USAGE}
-  else
     echo "Invalid version: ${1}"
-    echo ${MY_USAGE}
   fi
+
+  MY_USAGE="Usage: ghc-config  |"
+  for v in ${MY_VERSIONS}
+  do
+    if [ "${v}" = "${CURR_VERSION}" ]
+    then
+      MY_USAGE+=" ${v}* |"
+    else
+      MY_USAGE+=" ${v} |"
+    fi
+  done
+  echo ${MY_USAGE}
+  unset MY_USAGE
+
 fi
 
+unset CURR_VERSION
+unset MY_VERSIONS
 unset MY_SUCCESS
-unset MY_USAGE
