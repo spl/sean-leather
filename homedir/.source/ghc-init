@@ -1,1 +1,4 @@
-source ${MY_SOURCE_DIR}/ghc-config 6.10.1
+source ${MY_SOURCE_DIR}/ghc-config > /dev/null
+VERSION=`cat .ghc-config/current`
+echo "You are using GHC ${VERSION}."
+unset VERSION

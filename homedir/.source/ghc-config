@@ -1,60 +1,111 @@
 GHC_DIR=/opt/ghc
 
-MY_SUCCESS="0"
-MY_VERSIONS=`/bin/ls ${GHC_DIR}`
-CURR_VERSION=`echo $PATH | perl -nle 'print "$1" if m|.*/opt/ghc/([^/]+)/bin.*|'`
+VERSIONS=`/bin/ls ${GHC_DIR}`
+GHC_CONFIG_DIR=${HOME}/.ghc-config
+CURR_VERSION_FILE=${GHC_CONFIG_DIR}/current
 
-for v in ${MY_VERSIONS}
-do
-  if [ "${v}" = "${1}" ]
-  then
-    GHC_VERSION=${1}
-    GHC_PATH=${GHC_DIR}/${GHC_VERSION}/bin
+function set_ghc_path()
+{
+  # Set new GHC version in environment and in current version file
+  GHC_VERSION=${1}
+  echo -n "${GHC_VERSION}" > ${CURR_VERSION_FILE}
 
-    # Set up path with correct version
-    if [ "${CURR_VERSION}" = "" ]
+  # Remove any old GHC paths
+  PATH=`echo ${PATH} | sed "s|${GHC_DIR}/[^:]*||g" | sed "s/::/:/g" | sed "s/^://" | sed "s/:$//"`
+
+  # Set new GHC path
+  GHC_PATH=${GHC_DIR}/${GHC_VERSION}/bin
+
+  # Append a new one to the path
+  PATH=${PATH}:${GHC_PATH}
+
+  # Link to the cabal-install configuration directory
+  CABAL_DIR=${HOME}/.cabal
+  rm -f ${CABAL_DIR}
+  ln -s ${GHC_CONFIG_DIR}/${GHC_VERSION}/cabal ${CABAL_DIR}
+  unset CABAL_DIR
+}
+
+function usage()
+{
+(
+  INIT="1"
+  STR="Usage: ghc-config "
+
+  for v in ${VERSIONS}
+  do
+
+    if [ "${INIT}" = "0" ]; then STR+="|"; fi
+    INIT="0"
+
+    if [ "${v}" = "${GHC_VERSION}" ]
     then
-      # No previous GHC path was found, so we append a new one to the path
-      PATH=${PATH}:${GHC_PATH}
+      STR+="[${v}]"
     else
-      # Search and replace the old version number with the new
-      PATH=`echo ${PATH} | sed "s|${GHC_DIR}/[^/]*|${GHC_DIR}/${GHC_VERSION}|g"`
+      STR+="${v}"
     fi
 
-    # Link to the cabal-install configuration directory
-    CABAL_DIR=${HOME}/.cabal
-    rm -f ${CABAL_DIR}
-    ln -s ${HOME}/.ghc-config/${GHC_VERSION}/cabal ${CABAL_DIR}
-    unset CABAL_DIR
+  done
 
-    echo "You are now using GHC ${GHC_VERSION}."
-    MY_SUCCESS="1"
-  fi
-done
+  echo ${STR}
+)
+}
 
-if [ "${MY_SUCCESS}" = "0" ]
+# Get current version from a file
+if [ -e ${CURR_VERSION_FILE} ]
+then
+  CURR_VERSION=`cat ${CURR_VERSION_FILE}`
+else
+  CURR_VERSION=""
+fi
+
+# Test argument and do appropriate things
+if [ "${1}" = "" ]
 then
 
-  if [ "${1}" != "" ]
+  if [ "${CURR_VERSION}" = "" ]
   then
-    echo "Invalid version: ${1}"
+    # No arg and no current version, so be sure env is clean
+    unset GHC_VERSION
+    unset GHC_PATH
+  else
+    # No arg but current version exists, so be sure path is set up correctly
+    set_ghc_path ${CURR_VERSION}
   fi
 
-  MY_USAGE="Usage: ghc-config  |"
-  for v in ${MY_VERSIONS}
+  usage
+
+else
+  # Arg given, so check validity
+
+  SUCCESS="0"
+
+  for v in ${VERSIONS}
   do
-    if [ "${v}" = "${CURR_VERSION}" ]
+    if [ "${v}" = "${1}" ]
     then
-      MY_USAGE+=" ${v}* |"
-    else
-      MY_USAGE+=" ${v} |"
+      set_ghc_path ${1}
+      SUCCESS="1"
+      break
     fi
   done
-  echo ${MY_USAGE}
-  unset MY_USAGE
+
+  if [ "${SUCCESS}" = "0" ]
+  then
+    echo "Invalid version: ${1}"
+    usage
+  else
+    echo "You are now using GHC ${GHC_VERSION}."
+  fi
+
+  unset SUCCESS
 
 fi
 
+unset set_ghc_path
+unset usage
 unset CURR_VERSION
-unset MY_VERSIONS
-unset MY_SUCCESS
+unset CURR_VERSION_FILE
+unset VERSIONS
+unset GHC_CONFIG_DIR
+unset GHC_DIR
