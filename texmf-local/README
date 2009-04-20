@@ -1,0 +1,5 @@
+This directory is used for local packages as part of my TeX Live distribution.
+On the Mac, I have this at the following location:
+
+  /usr/local/texlive/texmf-local
+
