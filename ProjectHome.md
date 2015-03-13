@@ -1,0 +1,1 @@
+These are useful script and configuration settings for me.
